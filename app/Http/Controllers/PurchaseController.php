@@ -202,6 +202,14 @@ class PurchaseController extends Controller
 
                     return $due_html;
                 })
+                ->editColumn(
+                    'total_without_gst',
+                    '<span class="total_without_gst" data-orig-value="{{$total_without_gst}}">@format_currency($total_without_gst)</span>'
+                )
+                 ->editColumn(
+                    'total_gst',
+                    '<span class="total_gst" data-orig-value="{{$total_gst}}">@format_currency($total_gst)</span>'
+                )
                 ->setRowAttr([
                     'data-href' => function ($row) {
                         if (auth()->user()->can('purchase.view')) {
@@ -210,7 +218,7 @@ class PurchaseController extends Controller
                             return '';
                         }
                     }, ])
-                ->rawColumns(['final_total', 'action', 'payment_due', 'payment_status', 'status', 'ref_no', 'name'])
+                ->rawColumns(['final_total', 'action', 'payment_due', 'payment_status', 'status', 'ref_no', 'name','total_without_gst','total_gst'])
                 ->make(true);
         }
 
@@ -302,7 +310,7 @@ class PurchaseController extends Controller
                 return $this->moduleUtil->expiredResponse(action([\App\Http\Controllers\PurchaseController::class, 'index']));
             }
 
-            $transaction_data = $request->only(['ref_no', 'status', 'contact_id', 'transaction_date', 'total_before_tax', 'location_id', 'discount_type', 'discount_amount', 'tax_id', 'tax_amount', 'shipping_details', 'shipping_charges', 'final_total', 'additional_notes', 'exchange_rate', 'pay_term_number', 'pay_term_type', 'purchase_order_ids']);
+            $transaction_data = $request->only(['ref_no', 'status', 'contact_id', 'transaction_date', 'total_before_tax', 'location_id', 'discount_type', 'discount_amount', 'tax_id', 'tax_amount', 'shipping_details', 'shipping_charges', 'final_total', 'additional_notes', 'exchange_rate', 'pay_term_number', 'pay_term_type', 'purchase_order_ids','total_without_gst','total_gst']);
 
             $exchange_rate = $transaction_data['exchange_rate'];
 
@@ -344,6 +352,8 @@ class PurchaseController extends Controller
             $transaction_data['tax_amount'] = $this->productUtil->num_uf($transaction_data['tax_amount'], $currency_details) * $exchange_rate;
             $transaction_data['shipping_charges'] = $this->productUtil->num_uf($transaction_data['shipping_charges'], $currency_details) * $exchange_rate;
             $transaction_data['final_total'] = $this->productUtil->num_uf($transaction_data['final_total'], $currency_details) * $exchange_rate;
+            $transaction_data['total_without_gst']=$this->productUtil->num_uf($transaction_data['total_without_gst'], $currency_details) * $exchange_rate;
+            $transaction_data['total_gst']=$this->productUtil->num_uf($transaction_data['total_gst'], $currency_details) * $exchange_rate;
 
             $transaction_data['business_id'] = $business_id;
             $transaction_data['created_by'] = $user_id;

@@ -48,7 +48,7 @@ class PurchaseReturnController extends Controller
         $business_id = request()->session()->get('user.business_id');
 
         if (request()->ajax()) {
-            $purchases_returns = Transaction::leftJoin('contacts', 'transactions.contact_id', '=', 'contacts.id')
+            $purchases_returns = Transaction::with('purchase_lines')->leftJoin('contacts', 'transactions.contact_id', '=', 'contacts.id')
                     ->join(
                         'business_locations AS BS',
                         'transactions.location_id',
@@ -168,6 +168,49 @@ class PurchaseReturnController extends Controller
 
                     return '<span class="display_currency payment_due" data-currency_symbol="true" data-orig-value="'.$due.'">'.$due.'</sapn>';
                 })
+                ->addColumn('total_without_tax', function ($row) {
+                    $tt_without_tax = $row->purchase_lines->sum(function($t){ 
+
+                     if(!$t->tax_id):
+
+                        return $t->purchase_price_inc_tax* $t->quantity_returned;
+
+                     else:
+
+                        $tax_amount=$t->line_tax->amount;
+
+                        $item_tax=$tax_amount*$t->purchase_price_inc_tax/100;
+
+
+                     return ($t->purchase_price_inc_tax-$item_tax) * $t->quantity_returned; 
+
+                    endif;
+});
+
+                    return '<span class="display_currency total_without_tax" data-currency_symbol="true" data-orig-value="'.$tt_without_tax.'">'.$tt_without_tax.'</sapn>';
+                })
+
+                  ->addColumn('total_tax', function ($row) {
+                   $tt_tax = $row->purchase_lines->sum(function($t){ 
+
+                     if(!$t->tax_id):
+
+                        return 0.00;
+
+                     else:
+
+                        $tax_amount=$t->line_tax->amount;
+
+                        $item_tax=($tax_amount*$t->purchase_price_inc_tax)/100;
+
+
+                     return $item_tax * $t->quantity_returned ; 
+
+                    endif;
+});
+
+                    return '<span class="display_currency total_tax" data-currency_symbol="true" data-orig-value="'.$tt_tax.'">'.$tt_tax.'</sapn>';
+                })
                 ->setRowAttr([
                     'data-href' => function ($row) {
                         if (auth()->user()->can('purchase.view')) {
@@ -178,7 +221,7 @@ class PurchaseReturnController extends Controller
                             return '';
                         }
                     }, ])
-                ->rawColumns(['final_total', 'action', 'payment_status', 'parent_purchase', 'payment_due'])
+                ->rawColumns(['final_total', 'action', 'payment_status', 'parent_purchase', 'payment_due', 'total_without_tax', 'total_tax'])
                 ->make(true);
         }
 
@@ -380,9 +423,10 @@ class PurchaseReturnController extends Controller
            ->with(['causer', 'subject'])
            ->latest()
            ->get();
-
+           $taxes =\App\TaxRate::where('business_id', $business_id)
+           ->pluck('name', 'id');
         return view('purchase_return.show')
-                ->with(compact('purchase', 'purchase_taxes', 'activities'));
+                ->with(compact('purchase', 'purchase_taxes', 'activities', 'taxes'));
     }
 
     /**

@@ -190,6 +190,7 @@ class LabelsController extends Controller
             //$original_aspect_ratio = 4;//(w/h)
             $factor = (($barcode_details->width / $barcode_details->height)) / ($barcode_details->is_continuous ? 2 : 4);
             $html = '';
+
             foreach ($product_details_page_wise as $page => $page_products) {
                 if ($i == 0) {
                     $is_first = true;
@@ -199,7 +200,7 @@ class LabelsController extends Controller
                     $is_last = true;
                 }
 
-                $output = view('labels.partials.preview_2')
+                $output = view('labels.partials.preview_4')
                             ->with(compact('print', 'page_products', 'business_name', 'barcode_details', 'margin_top', 'margin_left', 'paper_width', 'paper_height', 'is_first', 'is_last', 'factor'))->render();
                 print_r($output);
                 //$mpdf->WriteHTML($output);
