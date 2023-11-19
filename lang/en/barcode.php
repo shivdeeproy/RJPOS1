@@ -10,7 +10,7 @@ return [
     | The following language lines are used for Brand CRUD operations.
     |
     */
-
+    'show_sale_price'=>'Show Sale Price',
     'barcodes' => 'Barcodes',
     'barcode_settings' => 'Barcode Settings',
     'manage_your_barcodes' => 'Manage your barcode settings',

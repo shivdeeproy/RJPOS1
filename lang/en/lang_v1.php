@@ -1,6 +1,8 @@
 <?php
 
 return [
+    'tax'=>'Tax',
+    'total_without_tax'=>'Total (Exc. tax)',
     'enable_editing_product_from_purchase' => 'Enable editing product price from purchase screen',
     'sales_commission_agent' => 'Sales Commission Agent',
     'sales_commission_agents' => 'Sales Commission Agents',
@@ -822,8 +824,14 @@ return [
     'third_party_order_id' => '3rd party Order ID',
     'payment_option_help' => 'Enable or disable payment methods for the location',
     'default_account_help' => 'Choose default account to be pre selected for the payment method. You can change it while adding payment',
+    'import_export_selling_price_group_prices' => 'Import/Export Selling Price Group Prices',
+    'export_selling_price_group_prices' => 'Export Selling Price Group Prices',
     'product_not_found_exception' => 'Product with SKU :sku not found  on row :row',
     'price_group_not_found_exception' => 'Price Group with name :pg not found on row :row',
+    'product_grp_prices_imported_successfully' => 'Product group prices imported successfully',
+    'price_group_import_istruction' => 'Export Selling price group prices.',
+    'price_group_import_istruction1' => 'Update the exported file and import the same file.',
+    'price_group_import_istruction2' => 'Only selling price group prices of the product will be updated. Any blank price will be skipped.',
     'price_group_non_numeric_exception' => 'Non numeric price found on row :row',
     'update_status' => 'Update Status',
     'types_of_service_details' => 'Types of service details',

@@ -197,6 +197,14 @@ function __write_number(
     input_element.val(__number_f(value, false, use_page_currency, precision));
 }
 
+
+function __get_number(   value,
+    use_page_currency = false,
+    precision = __currency_precision)
+{
+   return __number_f(value, false, use_page_currency, precision)
+}
+
 //Return the font-awesome html based on class value
 function __fa_awesome($class = 'fa-sync fa-spin fa-fw ') {
     return '<i class="fa ' + $class + '"></i>';

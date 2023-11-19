@@ -764,6 +764,9 @@ $(document).ready(function() {
     product_purchase_report = $('table#product_purchase_report_table').DataTable({
         processing: true,
         serverSide: true,
+        scrollY: "75vh",
+        scrollX:        true,
+        scrollCollapse: true,
         aaSorting: [[3, 'desc']],
         ajax: {
             url: '/reports/product-purchase-report',
@@ -794,20 +797,25 @@ $(document).ready(function() {
             { data: 'transaction_date', name: 't.transaction_date' },
             { data: 'purchase_qty', name: 'purchase_lines.quantity' },
             { data: 'quantity_adjusted', name: 'purchase_lines.quantity_adjusted' },
+            { data: 'tax_percent', name: 'tax_percent' },
+            { data: 'unit_price_without_tax', name: 'unit_price_without_tax' },
+            { data: 'item_tax', name: 'purchase_lines.item_tax' },
             { data: 'unit_purchase_price', name: 'purchase_lines.purchase_price_inc_tax' },
             { data: 'subtotal', name: 'subtotal', searchable: false },
         ],
         fnDrawCallback: function(oSettings) {
-            $('#footer_subtotal').text(
-                sum_table_col($('#product_purchase_report_table'), 'row_subtotal')
+            // console.log(__sum_stock($('#product_purchase_report_table'), 'purchase_qty'));
+
+            $('.footer_subtotal').html(
+                __currency_trans_from_en(sum_table_col($('#product_purchase_report_table'), 'row_subtotal'))
             );
-            $('#footer_total_purchase').html(
+            $('.footer_total_purchase').html(
                 __sum_stock($('#product_purchase_report_table'), 'purchase_qty')
             );
-            $('#footer_total_adjusted').html(
-                __sum_stock($('#product_purchase_report_table'), 'quantity_adjusted')
+            $('.footer_total_adjusted').html(
+               __sum_stock($('#product_purchase_report_table'), 'quantity_adjusted')
             );
-            __currency_convert_recursively($('#product_purchase_report_table'));
+         //   __currency_convert_recursively($('#product_purchase_report_table'));
         },
     });
 

@@ -11,6 +11,13 @@ return [
     |
     */
 
+    'total_tax'=>'Total Tax',
+    'total_amount_exc_tax' => 'Total (Exc. Tax)',
+    'default_mrp'=>'MRP',
+    'tax_percent'=>'TAX %',
+    'unit_price_without_tax'=>'Unit Price (Exc. tax)',
+    'selling_price_inc_tax'=>'Selling Price (Inc. tax)',
+    
     'sale' => 'Sell',
     'sells' => 'Sales',
     'list_sale' => 'List Sales',
