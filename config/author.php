@@ -13,9 +13,9 @@ return [
     |
     */
 
-    'vendor' => 'Ultimate Fosters',
-    'vendor_url' => 'http://ultimatefosters.com',
-    'email' => 'thewebfosters@gmail.com',
+    'vendor' => 'Royal Jyoti',
+    'vendor_url' => 'http://royaljyoti.com',
+    'email' => 'shivdeep.roy@gmail.com',
     'app_version' => '5.31',
     'lic1' => 'aHR0cHM6Ly9sLnVsdGltYXRlZm9zdGVycy5jb20vYXBpL3R5cGVfMQ==',
     'pid' => 1,
