@@ -1631,6 +1631,7 @@ class ReportController extends Controller
                     ->join('contacts as c', 't.contact_id', '=', 'c.id')
                     ->join('products as p', 'pv.product_id', '=', 'p.id')
                     ->leftjoin('units as u', 'p.unit_id', '=', 'u.id')
+                    ->leftjoin('tax_rates as tr','purchase_lines.tax_id','=','tr.id')
                     ->where('t.business_id', $business_id)
                     ->where('t.type', 'purchase')
                     ->select(
@@ -1639,12 +1640,15 @@ class ReportController extends Controller
                         'pv.name as product_variation',
                         'v.name as variation_name',
                         'v.sub_sku',
+                        'tr.amount as tax_percent',
                         'c.name as supplier',
                         'c.supplier_business_name',
                         't.id as transaction_id',
                         't.ref_no',
                         't.transaction_date as transaction_date',
                         'purchase_lines.purchase_price_inc_tax as unit_purchase_price',
+                        'purchase_lines.purchase_price as unit_price_without_tax',
+                        'purchase_lines.item_tax',
                         DB::raw('(purchase_lines.quantity - purchase_lines.quantity_returned) as purchase_qty'),
                         'purchase_lines.quantity_adjusted',
                         'u.short_name as unit',
