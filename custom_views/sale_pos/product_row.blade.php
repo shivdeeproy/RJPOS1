@@ -246,7 +246,7 @@
 		>
 		<span class="input-group-btn"><button type="button" class="btn btn-default btn-flat quantity-up"><i class="fa fa-plus text-success"></i></button></span>
 		</div>
-		{{-- #JCN remove sub_units from the products to sell and save space  --}}
+		
 		<input type="hidden" name="products[{{$row_count}}][product_unit_id]" value="{{$product->unit_id}}">
 		@if(count($sub_units) > 0)
 			<br>
@@ -261,7 +261,6 @@
 			{{$product->unit}}
 		@endif
 
- 		
 		@if(!empty($product->second_unit))
             <br>
             <span style="white-space: nowrap;">
@@ -334,6 +333,7 @@
 				$pos_unit_price = $so_line->unit_price_before_discount;
 			}
 		@endphp
+
 		<td class="@if(!auth()->user()->can('edit_product_price_from_sale_screen')) hide @endif">
 			<input type="text" name="products[{{$row_count}}][unit_price]" class="form-control pos_unit_price input_number mousetrap" value="{{@num_format($pos_unit_price)}}" @if(!empty($pos_settings['enable_msp'])) data-rule-min-value="{{$pos_unit_price}}" data-msg-min-value="{{__('lang_v1.minimum_selling_price_error_msg', ['price' => @num_format($pos_unit_price)])}}" @endif> 
 
@@ -379,6 +379,12 @@
 		@endif
 	@endif
 	<td class="{{$hide_tax}}">
+		<input type="text" name="products[{{$row_count}}][mrp_inc_tax]" class="form-control mrp_inc_tax input_number" value="{{@num_format($product->mrp_inc_tax)}}" @if(!$edit_price) readonly @endif >
+	</td>
+	<td class="{{$hide_tax}}">
+		<input type="text" name="products[{{$row_count}}][discount]" class="form-control discount input_number" value="{{@num_format($product->discount)}}" @if(!$edit_price) readonly @endif >
+	</td>
+	<td class="{{$hide_tax}}">
 		<input type="text" name="products[{{$row_count}}][unit_price_inc_tax]" class="form-control pos_unit_price_inc_tax input_number" value="{{@num_format($unit_price_inc_tax)}}" @if(!$edit_price) readonly @endif @if(!empty($pos_settings['enable_msp'])) data-rule-min-value="{{$unit_price_inc_tax}}" data-msg-min-value="{{__('lang_v1.minimum_selling_price_error_msg', ['price' => @num_format($unit_price_inc_tax)])}}" @endif>
 	</td>
 	@if(!empty($common_settings['enable_product_warranty']) && !empty($is_direct_sell))
@@ -397,21 +403,4 @@
 	<td class="text-center v-center">
 		<i class="fa fa-times text-danger pos_remove_row cursor-pointer" aria-hidden="true"></i>
 	</td>
-	{{-- #king capture product informations sent and recieved through the ajax call--}}
-			<input type="hidden" id="hidden-prod-brand" value="{{$product->brand}}">
-			<input type="hidden" id="hidden-prod-unit" value="{{$product->unit}}">
-			<input type="hidden" id="hidden-prod-secondUnit" value="{{$product->second_unit}}">
-			<input type="hidden" id="hidden-prod-secondUnitQty" value="{{$product->secondary_unit_quantity}}">
-			{{-- todo capture lot/batch and expire numbers --}}
-			{{-- <input type="hidden" class="hidden-prod-lot" value="{{$product->lot_numbers}}"> --}}
-			<input type="hidden" id="hidden-prod-vary" value="{{$product->product_variation_name}}">
-			<input type="hidden" id="hidden-prod-type" value="{{$product->variation_name}}">
-			<input type="hidden" id="hidden-prod-sku" value="{{$product->sub_sku}}">
-			<input type="hidden" id="hidden-prod-price" value="{{$product->default_sell_price}}">
-			<input type="hidden" id="hidden-prod-stock" value="{{$product->enable_stock}}">
-			<input type="hidden" id="hidden-prod-name" value="{{$product->product_actual_name}}">
-			<input type="hidden" id="hidden-prod-qty" value="{{$product->quantity_ordered}}">
-			
-			{{--#king capture ends here  --}}
-			
 </tr>

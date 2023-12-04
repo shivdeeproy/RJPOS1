@@ -199,13 +199,6 @@ Route::middleware(['setData', 'auth', 'SetSessionData', 'language', 'timezone', 
     Route::get('/sells/draft-dt', 'SellController@getDraftDatables');
     Route::resource('sells', 'SellController')->except(['show']);
     Route::get('/sells/copy-quotation/{id}', [SellPosController::class, 'copyQuotation']);
-    // Route::get('/sale_pos/customer-pos', 'SellPosController@customerPosView')->name('customer.pos.view');
-    Route::get('/sale_pos/customer-pos', [SellPosController::class, 'customerPosView'])->name('customer.pos.view');
-    Route::get('/customer-display-data', [SellPosController::class, 'getCustomerDisplayData'])->name('customer.display');
-    // Route::get('/customer-display-data', 'SellPosController@getCustomerDisplayData');
-
-
-
 
     Route::post('/import-purchase-products', [PurchaseController::class, 'importPurchaseProducts']);
     Route::post('/purchases/update-status', [PurchaseController::class, 'updateStatus']);
@@ -467,7 +460,7 @@ Route::middleware(['setData', 'auth', 'SetSessionData', 'language', 'timezone', 
     Route::resource('warranties', WarrantyController::class);
 
     Route::resource('dashboard-configurator', DashboardConfiguratorController::class)
-        ->only(['edit', 'update']);
+    ->only(['edit', 'update']);
 
     Route::get('view-media/{model_id}', [SellController::class, 'viewMedia']);
 

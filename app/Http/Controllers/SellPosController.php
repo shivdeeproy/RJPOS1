@@ -64,7 +64,6 @@ use Stripe\Stripe;
 use Yajra\DataTables\Facades\DataTables;
 use App\Events\SellCreatedOrModified;
 
-
 class SellPosController extends Controller
 {
     /**
@@ -1931,10 +1930,6 @@ class SellPosController extends Controller
 
             $products = Variation::join('products as p', 'variations.product_id', '=', 'p.id')
                 ->join('product_locations as pl', 'pl.product_id', '=', 'p.id')
-                ->leftjoin('brands', function ($join) {
-                    $join->on('p.brand_id', '=', 'brands.id')
-                        ->whereNull('brands.deleted_at');
-                })
                 ->leftjoin(
                     'variation_location_details AS VLD',
                     function ($join) use ($location_id) {
@@ -2001,9 +1996,6 @@ class SellPosController extends Controller
                 'p.id as product_id',
                 'p.name',
                 'p.type',
-                'p.brand_id',
-                'brands.name as brand',
-                'p.category_id',
                 'p.enable_stock',
                 'p.image as product_image',
                 'variations.id',
@@ -2012,10 +2004,9 @@ class SellPosController extends Controller
                 'variations.default_sell_price as selling_price',
                 'variations.sub_sku'
             )
-                
             ->with(['media', 'group_prices'])
             ->orderBy('p.name', 'asc')
-            ->paginate(40); //#JCN paginate...
+            ->paginate(50);
 
             $price_groups = SellingPriceGroup::where('business_id', $business_id)->active()->pluck('name', 'id');
 
@@ -3098,36 +3089,5 @@ class SellPosController extends Controller
                             ->update(['paused_at' => null, 'available_at' => null]);
 
         return ['success' => true];
-    }
-    
-    // #king pos return view here with featured products
-    public function customerPosView(request $request)
-    {
-        $business_id = request()->session()->get('user.business_id');
-       
-        $register_details = $this->cashRegisterUtil->getCurrentCashRegister(auth()->user()->id);
-        $default_location = !empty($register_details->location_id) ? BusinessLocation::findOrFail($register_details->location_id) : null;
-
-        $business_locations = BusinessLocation::forDropdown($business_id, false, true);
-        $bl_attributes = $business_locations['attributes'];
-        $business_locations = $business_locations['locations'];
-        //set first location as default locaton
-        if (empty($default_location)) {
-            foreach ($business_locations as $id => $name) {
-                $default_location = BusinessLocation::findOrFail($id);
-                break;
-            }
-        }
-        
-        $featured_products = !empty($default_location) ? $default_location->getFeaturedProducts() : [];
-  
-        return view('sale_pos.customer_pos')->with(compact('featured_products'));
-    }
-
-    public function customerPosAdsView(request $request)
-    {
-
-       
-        return view('sale_pos.customer_pos_saver');
     }
 }
