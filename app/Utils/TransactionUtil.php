@@ -382,7 +382,6 @@ class TransactionUtil extends Util
                     'res_line_order_status' => ! empty($product['res_service_staff_id']) ? 'received' : null,
                     'so_line_id' => ! empty($product['so_line_id']) ? $product['so_line_id'] : null,
                     'secondary_unit_quantity' => ! empty($product['secondary_unit_quantity']) ? $this->num_uf($product['secondary_unit_quantity']) : 0,
-                    'discount'=>$product['discount']?$product['discount']:0
                 ];
 
                 foreach ($extra_line_parameters as $key => $value) {
@@ -1999,7 +1998,6 @@ class TransactionUtil extends Util
                 'quantity' => $this->num_f($line->quantity, false, $business_details, true),
                 'quantity_uf' => $line->quantity,
                 'units' => $unit_name,
-                'mrp_inc_tax'=>$variation->mrp_inc_tax,
 
                 'base_unit_name' => $base_unit_name,
                 'base_unit_multiplier' => ! empty($line->multiplier) && $line->multiplier != 1 ? $this->num_f($line->multiplier, false, $business_details) : 1,
@@ -2026,8 +2024,6 @@ class TransactionUtil extends Util
                 'line_total_exc_tax' => $this->num_f($line->unit_price * $line->quantity, false, $business_details),
                 'line_total_exc_tax_uf' => $line->unit_price * $line->quantity,
                 'variation_id' => $variation->id,
-                'hsn'=>$product->product_custom_field2??'',
-                'discount'=>$line->discount??0,
             ];
 
             $temp = [];
@@ -4904,9 +4900,6 @@ class TransactionUtil extends Util
                         'contacts.supplier_business_name',
                         'transactions.status',
                         'transactions.payment_status',
-                        'transactions.total_without_gst',
-                        'transactions.total_gst',
-                        'transactions.tax_amount',
                         'transactions.final_total',
                         'BS.name as location_name',
                         'transactions.pay_term_number',
@@ -5622,11 +5615,19 @@ class TransactionUtil extends Util
             'end_date' => $end_date,
             'location_id' => $location_id,
         ];
-        $project_module_data = $moduleUtil->getModuleData('grossProfit', $module_parameters);
+        $grossProfitData = $moduleUtil->getModuleData('grossProfit', $module_parameters);
 
-        if (! empty($project_module_data['Project']['gross_profit'])) {
-            $gross_profit = $gross_profit + $project_module_data['Project']['gross_profit'];
-            $data['gross_profit_label'] = __('project::lang.project_invoice');
+        // if (! empty($project_module_data['Project']['gross_profit'])) {
+        //     $gross_profit = $gross_profit + $project_module_data['Project']['gross_profit'];
+        //     $data['gross_profit_label'] = __('project::lang.project_invoice');
+        // }
+
+        $data['gross_profit_label'] = [];
+        if(! empty($grossProfitData)){
+            foreach($grossProfitData as $value){
+                $data['gross_profit_label'][] = $value['label'];
+                $gross_profit = $gross_profit + $value['value'];
+            }
         }
 
         $data['gross_profit'] = $gross_profit;
@@ -6014,67 +6015,6 @@ class TransactionUtil extends Util
             $this->activityLog($sell_return, 'edited', $sell_return_before);
         }
 
-        // update on 5/5/23
-
-        if(isset($input['save_and_credit'])):
-
-            $credit_note=TransactionPayment::where('business_id',$business_id)
-                        ->where('transaction_id',$sell_return->id)
-                        ->where('payment_for',$sell_return->contact_id)
-                        ->first();
-    
-    
-              $note['method']='cash';
-    
-              $note['payment_ref_no']=$sell_return->invoice_no;
-    
-              $note['transaction_id']=$sell_return->id;
-    
-              $note['amount']=$invoice_total['final_total'];
-    
-              $note['is_return']=1;
-    
-              $note['business_id']=$business_id;
-    
-              $note['payment_for']=$sell_return->contact_id;
-    
-    
-    
-            if($credit_note):
-    
-              $note['amount']=$credit_note->amount;
-    
-              $this->updateCustomerBalance('subtract',$note);
-    
-              $note['amount']=$invoice_total['final_total'];
-    
-    
-    
-              $credit_note->update($note);
-    
-    
-    
-            else:
-    
-                $credit_note = TransactionPayment::create($note);
-    
-    
-    
-    
-            endif;
-    
-    
-    
-                $this->updateCustomerBalance('add',$note);
-    
-    
-    
-    
-            endif;
-    
-            //end
-
-
         if ($business->enable_rp == 1 && ! empty($sell->rp_earned)) {
             $is_reward_expired = $this->isRewardExpired($sell->transaction_date, $business_id);
             if (! $is_reward_expired) {
@@ -6343,27 +6283,4 @@ class TransactionUtil extends Util
 
         return $mpdf;
     }
-
-    public function updateCustomerBalance($type,$note)
-    {
-
-                    if($note['payment_for'] && $note['amount']):
-
-                        $customer=Contact::find($note['payment_for']);
-
-                        if($type=='add'):
-
-                        $customer->balance=$customer->balance+$note['amount'];
-                    else:
-
-                        $customer->balance=$customer->balance-$note['amount'];
-
-
-                    endif;
-
-                        $customer->save();
-
-                    endif;
-    }
-
 }

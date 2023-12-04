@@ -11,7 +11,6 @@ use App\Utils\ProductUtil;
 use App\Utils\TransactionUtil;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
-use App\Contact;
 
 class CombinedPurchaseReturnController extends Controller
 {
@@ -124,11 +123,7 @@ class CombinedPurchaseReturnController extends Controller
                         'quantity_returned' => $this->productUtil->num_uf($product['quantity']),
                         'lot_number' => ! empty($product['lot_number']) ? $product['lot_number'] : null,
                         'exp_date' => ! empty($product['exp_date']) ? $this->productUtil->uf_date($product['exp_date']) : null,
-                        'item_tax'=>$product['item_tax']??'0.00',
                     ];
-                    if($product['tax_id']):
-                        $return_line['tax_id']=$product['tax_id'];
-                    endif;
 
                     $product_data[] = $return_line;
 
@@ -143,26 +138,6 @@ class CombinedPurchaseReturnController extends Controller
 
                 $purchase_return = Transaction::create($input_data);
                 $purchase_return->purchase_lines()->createMany($product_data);
-                
-                
-
-                if(isset($request->save_and_debit_note)):
-
-                    $contact_id=$purchase_return->contact_id;
-
-                   if($contact_id && $purchase_return->final_total):
-
-                       $customer=Contact::find($contact_id);
-
-                       $customer->balance=$customer->balance+$purchase_return->final_total;
-
-                       $customer->save();
-
-                   endif;
-
-
-
-               endif;
 
                 //update payment status
                 $this->transactionUtil->updatePaymentStatus($purchase_return->id, $purchase_return->final_total);
